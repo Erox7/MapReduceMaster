@@ -58,11 +58,9 @@ public class Exercice3 extends Configured implements Tool
     public static class TopNMapper
             extends Mapper<Text, IntWritable, Text, IntWritable>
     {
-        private final static IntWritable one = new IntWritable(1);
         private Text word = new Text();
-        private TreeMap<String,Integer> top2N = new TreeMap<String,Integer>();
+        private HashMap<String,Integer> top2N = new HashMap<String,Integer>();
         private Integer N;
-        private IntWritable keyValue;
 
         public void map(Text key, IntWritable value, Context context
         ) throws IOException, InterruptedException {
@@ -76,11 +74,12 @@ public class Exercice3 extends Configured implements Tool
 
         @Override
         public void cleanup(Context context) throws IOException, InterruptedException {
-            Map<String,Integer> sortedMap = sortMap(top2N, N*2);
-            for(Map.Entry<String,Integer> pair : sortedMap.entrySet()){
-                keyValue = new IntWritable(pair.getValue());
-                word.set(pair.getKey());
-                context.write(word,keyValue);
+            if(top2N.size() > 0 ) {
+                Map<String, Integer> sortedMap = sortMap(top2N, N * 2);
+                for (Map.Entry<String, Integer> pair : sortedMap.entrySet()) {
+                    word.set(pair.getKey());
+                    context.write(word, new IntWritable(pair.getValue()));
+                }
             }
         }
 
@@ -109,7 +108,7 @@ public class Exercice3 extends Configured implements Tool
     public static class TopNReducer
             extends Reducer<Text,IntWritable,Text,IntWritable>
     {
-        private TreeMap<String,Integer> topNtotal = new TreeMap<String,Integer>();
+        private HashMap<String,Integer> topNtotal = new HashMap<String,Integer>();
         private Integer N;
         public void reduce(Text key, Iterable<IntWritable> values,
                            Context context) throws IOException, InterruptedException
@@ -158,7 +157,6 @@ public class Exercice3 extends Configured implements Tool
         args = new GenericOptionsParser(conf, args).getRemainingArgs();
         String N = args[2];
         conf.set("N",N);
-        System.out.println(N);
         Job job = Job.getInstance(conf, "Exercice 3");
 
         job.setJarByClass(Exercice3.class);
@@ -178,7 +176,7 @@ public class Exercice3 extends Configured implements Tool
     }
 
     public static void main(String[] args) throws Exception {
-        int exitCode = ToolRunner.run(new Exercice1(), args);
+        int exitCode = ToolRunner.run(new Exercice3(), args);
         System.exit(exitCode);
     }
 }
