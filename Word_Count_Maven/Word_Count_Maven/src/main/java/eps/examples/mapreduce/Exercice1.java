@@ -41,11 +41,11 @@ public class Exercice1 extends Configured implements Tool
                 String[] words = text.split("[,.-_@/ \n]") ;
                 for (String str: words)
                 {
-                m = p.matcher(str);
-                if(m.find()) {
-                    word.set(str);
-                    context.write(word, one);  //Write map result {word,1}
-                }
+                    m = p.matcher(str);
+                    if(m.find()) {
+                        word.set(str);
+                        context.write(word, one);  //Write map result {word,1}
+                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
